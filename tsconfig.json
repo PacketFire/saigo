@@ -1,0 +1,39 @@
+{
+  "compilerOptions": {
+      "lib": [
+        "es5", "es6", "dom", "dom.iterable"
+      ],
+      "alwaysStrict": true,
+      "experimentalDecorators": true,
+      "module": "commonjs",
+      "esModuleInterop": true,
+      "resolveJsonModule" : true,
+      "allowSyntheticDefaultImports": true,
+      "moduleResolution": "node",
+      "noEmitOnError": false,
+      "jsx": "react",
+      "strict": true,
+      "baseUrl": "src",
+      "rootDirs": [
+        "src"
+      ],
+      "noUnusedLocals": true,
+      "noEmit": true,
+      "noUnusedParameters": true,
+      "pretty": true,
+      "preserveConstEnums": true,
+      "stripInternal": true,
+      "target": "esnext",
+      "typeRoots": [
+          "src/types",
+          "node_modules/@types"
+      ]
+  },
+  "include": [
+    "src"
+  ],
+  "exclude": [
+    "node_modules"
+  ],
+  "compileOnSave": true
+}
