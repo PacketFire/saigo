@@ -1,16 +1,16 @@
+import { SlashCommand } from "core/interfaces/command"
 import { CommandInteraction, Client, Interaction } from "discord.js"
-import { slashCommands } from "../../commands/slash/triggers"
 
 
-export default (client: Client): void => {
+export default (client: Client, slashCommands: SlashCommand[]): void => {
     client.on("interactionCreate", async (interaction: Interaction) => {
         if (interaction.isCommand() || interaction.isContextMenuCommand()) {
-            await handleSlashCommand(client, interaction)
+            await handleSlashCommand(client, slashCommands, interaction)
         }
     })
 }
 
-const handleSlashCommand = async (client: Client, interaction: CommandInteraction): Promise<void> => {
+const handleSlashCommand = async (client: Client, slashCommands: SlashCommand[], interaction: CommandInteraction): Promise<void> => {
     const commandTrigger = slashCommands.find(c => c.name === interaction.commandName);
     if (!commandTrigger) {
         interaction.followUp({ content: "An error has occurred" });

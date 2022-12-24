@@ -1,7 +1,7 @@
+import { SlashCommand } from "core/interfaces/command";
 import { Client } from "discord.js"
-import { slashCommands } from "../../commands/slash/triggers";
 
-export default (client: Client): void => {
+export default (client: Client, slashCommands: SlashCommand[]): void => {
     client.on("ready", async () => {
         if (!client.user || !client.application) {
             return;
