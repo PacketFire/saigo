@@ -1,19 +1,21 @@
-import { Client, IntentsBitField } from "discord.js"
+import { Client, IntentsBitField, GatewayIntentBits } from "discord.js"
 import config from "../data/config.json"
 import ready from "./core/listeners/ready"
-import interaction from "./core/listeners/interaction"
 
-import getSlashCommands from "./commands/slash/triggers";
-
-const client = new Client({ intents: [IntentsBitField.Flags.Guilds] });
+const client = new Client({ 
+    intents: [
+        IntentsBitField.Flags.Guilds,
+        GatewayIntentBits.DirectMessages,
+        GatewayIntentBits.Guilds,
+        GatewayIntentBits.GuildBans,
+        GatewayIntentBits.GuildMessages,
+        GatewayIntentBits.MessageContent,
+    ]
+})
 
 async function main() {
-    const slashCommands = await getSlashCommands();
-
-    ready(client, slashCommands)
-    interaction(client, slashCommands)
-    
-    await client.login(config.token);
+    ready(client)
+    await client.login(config.token)
 }
 
 main()

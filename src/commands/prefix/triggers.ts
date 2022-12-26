@@ -1,9 +1,8 @@
-import { PrefixCommand } from "../../core/interfaces/command"
+import { PrefixCommand } from "core/interfaces/command"
+import { test } from "./test"
 
-class Triggers {
-    public handleTrigger(command: PrefixCommand) {
-        console.log(command)
-    }
+export default async function(): Promise<PrefixCommand[]> {
+  return [
+    test
+  ]
 }
-
-export default Triggers
