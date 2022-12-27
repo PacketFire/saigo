@@ -5,6 +5,6 @@ export const test: PrefixCommand = {
     name: 'test',
     description: 'test command',
     run: async (message: Message) => {
-        message.channel.send('test message complate..')
+        message.channel.send('test message complete..')
     }
 }
