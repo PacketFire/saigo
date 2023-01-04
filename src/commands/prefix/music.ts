@@ -16,15 +16,24 @@ export const music: PrefixCommand = {
             case 'fetch':
                 if(link) {
                     if(link.includes('https://www.youtube.com/watch?')) {
+                        // Output message indicating download initialization (output related song data)
+                        message.channel.send('Starting download...')
                         exec(
-                            'youtube-dl.exe --rm-cache-dir -v -o ' + musicDir + '%(title)s.%(ext)s ' + link, 
+                            // requires ffmpeg/ffprobe
+                            //'youtube-dl.exe --rm-cache-dir -x --audio-format mp3 -o ' + musicDir + '%(title)s.%(ext)s ' + link,
+                            'youtube-dl.exe --rm-cache-dir -o ' + musicDir + '%(title)s.%(ext)s ' + link,
                             function(error, stdout, stderr) {
                                 // Need to parse output properly
                                 if(error) {
                                     message.channel.send('Could not download that song. ' + error)
                                 }
+
                                 if(stdout) {
-                                    console.log(stdout)
+                                    let lines = stdout.split(/[\r\n]+/)
+                                    lines.pop()
+                                    let rate = lines.at(-1)?.replace('[download]', '')
+
+                                    message.channel.send('Download completed ' + rate)
                                 }
 
                                 if(stderr) {
