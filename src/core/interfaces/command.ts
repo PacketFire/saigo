@@ -7,7 +7,7 @@ import {
 
 
 export interface PrefixCommand extends ChatInputApplicationCommandData {
-    run: (message: Message) => void
+    run: (message: Message, parsedMsg: Array<string>) => void
 }
 
 export interface SlashCommand extends ChatInputApplicationCommandData {
