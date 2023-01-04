@@ -23,9 +23,10 @@ export const music: PrefixCommand = {
                             //'youtube-dl.exe --rm-cache-dir -x --audio-format mp3 -o ' + musicDir + '%(title)s.%(ext)s ' + link,
                             'youtube-dl.exe --rm-cache-dir -o ' + musicDir + '%(title)s.%(ext)s ' + link,
                             function(error, stdout, stderr) {
-                                // Need to parse output properly
                                 if(error) {
-                                    message.channel.send('Could not download that song. ' + error)
+                                    // output to console rather until error message is parsed for cleaner channel output
+                                    console.log(error)
+                                    message.channel.send('Could not download that song. ')
                                 }
 
                                 if(stdout) {
@@ -33,7 +34,7 @@ export const music: PrefixCommand = {
                                     lines.pop()
                                     let rate = lines.at(-1)?.replace('[download]', '')
 
-                                    message.channel.send('Download completed ' + rate)
+                                    message.channel.send('Download complete ' + rate)
                                 }
 
                                 if(stderr) {
