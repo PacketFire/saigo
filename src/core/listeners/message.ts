@@ -1,9 +1,10 @@
 import { Client, Message, User } from "discord.js"
 import getPrefixCommands from "../../commands/prefix/triggers"
+import { Database } from "better-sqlite3"
 
 const acceptedPrefix = ['!', '.']
 
-export default (client: Client): void => {
+export default (client: Client, db: Database): void => {
     client.on('messageCreate', async (message) => {
         if(!message.content) {
             return
@@ -15,7 +16,7 @@ export default (client: Client): void => {
             )
 
             if(await handlePermissions(message.author)) {
-                await handlePrefixCommand(message)
+                await handlePrefixCommand(message, db)
             }
         }
     })
@@ -26,7 +27,7 @@ const handlePermissions = async (author: User): Promise<boolean> => {
     return author.id === '391394861669941249' || author.id === '105768800191811584'
 }
 
-const handlePrefixCommand = async (message: Message): Promise<void> => {
+const handlePrefixCommand = async (message: Message, db: Database): Promise<void> => {
     const prefixCommands = await getPrefixCommands()
 
     acceptedPrefix.forEach((prefix: string) => {
@@ -40,7 +41,7 @@ const handlePrefixCommand = async (message: Message): Promise<void> => {
                 return
             }
 
-            commandTrigger.run(message, parsedMsg)
+            commandTrigger.run(message, parsedMsg, db)
         }
     })
 }
