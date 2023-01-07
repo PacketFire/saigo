@@ -23,11 +23,7 @@ export default (client: Client): void => {
 
 const handlePermissions = async (author: User): Promise<boolean> => {
     // temporarily hardcode until database support is added
-    if(author.id === '391394861669941249' || '105768800191811584') {
-        return true
-    } else {
-        return false
-    }
+    return author.id === '391394861669941249' || author.id === '105768800191811584'
 }
 
 const handlePrefixCommand = async (message: Message): Promise<void> => {
