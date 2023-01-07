@@ -3,7 +3,10 @@ import { Client } from "discord.js"
 import message from "./message"
 import interaction from "./interaction"
 import getSlashCommands from "../../commands/slash/triggers"
+import Database from 'better-sqlite3'
 
+const db = Database('data/saigo.db')
+db.pragma('journal_mode = WAL')
 
 export default (client: Client): void => {
     client.on('ready', async () => {
@@ -12,9 +15,10 @@ export default (client: Client): void => {
             return
         }
         console.log(`${client.user.username} is logged in and ready!\n`)
-    
+
+        
         // handle messages
-        message(client)
+        message(client, db)
 
         // handle interactions
         const slashCommands = await getSlashCommands()
