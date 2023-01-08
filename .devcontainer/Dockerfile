@@ -6,8 +6,8 @@ RUN apt update && \
     ln -s /usr/bin/python3 /usr/local/bin/python && \
     apt install -y ffmpeg
 
-RUN mkdir -p /workspaces/userkaf/music
+RUN mkdir -p /data/music
 
 ENV FFMPEG_PATH /usr/bin/ffmpeg
 ENV YOUTUBE_DL_PATH /usr/local/bin/youtube-dl
-ENV MUSIC_PATH /workspaces/userkaf/music
+ENV MUSIC_PATH /data/music
