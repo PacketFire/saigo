@@ -18,6 +18,8 @@
 
 # misc
 npm-debug.log
+backup/
+music/
 
 # System Files
 .DS_Store
