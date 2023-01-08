@@ -1,7 +1,8 @@
-import { spawn } from "child_process"
+import { spawn, exec } from "child_process"
 import { PrefixCommand } from "core/interfaces/command"
 import { Message } from "discord.js"
 import { Database } from "better-sqlite3"
+import crypto from "crypto"
 import {
     joinVoiceChannel,
     createAudioPlayer,
@@ -32,9 +33,16 @@ export const music: PrefixCommand = {
                 const link = parsedMsg[2]
 
                 if (link) {
+                    const songId = crypto.randomUUID()
+
                     if (link.includes("https://www.youtube.com/watch?")) {
+                        const title = await getMetadata(link)
+
                         // Output message indicating download initialization (output related song data)
-                        message.channel.send("Starting download...")
+                        message.channel.send(
+                            `Starting download for **${title}**...`
+                        )
+
                         const ytdl = spawn(
                             // requires ffmpeg/ffprobe
                             // for the following in windows to utilize ffmpeg when using git bash must specify a --ffmpeg-location option
@@ -48,7 +56,7 @@ export const music: PrefixCommand = {
                                 "--audio-format",
                                 "opus",
                                 "-o",
-                                `${MUSIC_PATH}/%(title)s.%(ext)s`,
+                                `${MUSIC_PATH}/${songId}.%(ext)s`,
                                 link,
                             ]
                         )
@@ -70,41 +78,44 @@ export const music: PrefixCommand = {
                         //             let songNameExt = lines.at(-3)?.replace('[ffmpeg] Destination: ' + musicDir, '')
                         //             let songName = songNameExt?.replace('.mp3', '')
 
-                        //             try {
-                        //                 const stmt = db.prepare('insert into music (name,fetched_by) values(?, ?)')
-                        //                 stmt.run(songName, message.author.username)
-                        //             } catch (err) {
-                        //                 console.log(err)
-                        //                 message.channel.send('Error inserting songName into database.')
-                        //             }
-
                         //             message.channel.send('Download of **' + songName + '** complete! ' + rate)
                         //         }
 
-                        // if (stdout) {
-                        //     const lines = stdout.split(/[\r\n]+/)
-                        //     const rate = lines.at(-6)?.replace('[download]', '')
-                        //     message.channel.send('Download complete ' + rate)
-                        // }
-
-                        //     stdout.
-
-                        //     if (stderr) {
-                        //         console.log(stderr)
-                        //     }
-                        // }
+                        let rate = ""
 
                         ytdl.stdout.on("data", (data) => {
-                            console.log(data.toString())
+                            const line = data.toString()
+                            // console.log(line)
+                            if (line.includes("[download] 100% of ")) {
+                                rate = line.replace("[download] ", "").trim()
+                            }
                         })
 
                         ytdl.stderr.on("data", (data) => {
-                            console.log(data.toString())
+                            console.error(data.toString())
                         })
 
                         ytdl.on("close", (code) => {
                             if (code === 0) {
-                                message.channel.send("Download complete.")
+                                try {
+                                    const stmt = db.prepare(
+                                        "insert into music (id,name,fetched_by) values(?, ?, ?)"
+                                    )
+                                    stmt.run(
+                                        songId,
+                                        title,
+                                        message.author.username
+                                    )
+
+                                    message.channel.send(
+                                        `Download completed ${rate}, id=**${songId}**.`
+                                    )
+                                } catch (err) {
+                                    console.log(err)
+                                    message.channel.send(
+                                        "Error inserting songName into database."
+                                    )
+                                }
                             } else {
                                 message.channel.send(
                                     "Could not download that song."
@@ -187,4 +198,20 @@ export const music: PrefixCommand = {
                 break
         }
     },
+}
+
+function getMetadata(url: string): Promise<string> {
+    return new Promise((resolve, reject) => {
+        exec(
+            `${YOUTUBE_DL_PATH} --print-json --skip-download ${url}`,
+            function (error, stdout) {
+                if (error) {
+                    reject(error)
+                }
+
+                const metadata = JSON.parse(stdout)
+                resolve(metadata["title"])
+            }
+        )
+    })
 }
