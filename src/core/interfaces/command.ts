@@ -3,11 +3,12 @@ import {
     ChatInputApplicationCommandData, 
     Client,
     Message
-} from "discord.js";
+} from "discord.js"
+import { Database } from "better-sqlite3"
 
 
 export interface PrefixCommand extends ChatInputApplicationCommandData {
-    run: (message: Message, parsedMsg: Array<string>) => void
+    run: (message: Message, parsedMsg: Array<string>, db: Database) => void
 }
 
 export interface SlashCommand extends ChatInputApplicationCommandData {
