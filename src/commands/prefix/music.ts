@@ -13,8 +13,6 @@ import {
 import path from "path"
 import { createReadStream } from "fs"
 
-// temporarily setting a hard path for music directory until it is added to configuration
-//let musicDir = 'C:/Users/Brock/Documents/brock/code/saigo/data/music/' // Windows local
 const MUSIC_PATH = process.env.MUSIC_PATH || "/home/brock/saigo/data/music"
 const FFMPEG_PATH = process.env.FFMPEG_PATH || "ffmpeg"
 const YOUTUBE_DL_PATH = process.env.YOUTUBE_DL_PATH || "youtube-dl"
@@ -25,7 +23,13 @@ export const music: PrefixCommand = {
     name: "music",
     description:
         "Music command: usage !music <help|fetch|play|stop|skip> <link>",
-    run: async (message: Message, parsedMsg: Array<string>, db: Database) => {
+    run: async (
+        message: Message,
+        parsedMsg: Array<string>,
+        db: Database,
+        auth_type: string
+    ) => {
+        console.log(auth_type)
         const subCmd = parsedMsg[1]
 
         switch (subCmd) {
@@ -38,15 +42,11 @@ export const music: PrefixCommand = {
                     if (link.includes("https://www.youtube.com/watch?")) {
                         const title = await getMetadata(link)
 
-                        // Output message indicating download initialization (output related song data)
                         message.channel.send(
                             `Starting download for **${title}**...`
                         )
 
                         const ytdl = spawn(
-                            // requires ffmpeg/ffprobe
-                            // for the following in windows to utilize ffmpeg when using git bash must specify a --ffmpeg-location option
-                            //'youtube-dl.exe --rm-cache-dir -o ' + musicDir + '%(title)s.%(ext)s ' + link,
                             YOUTUBE_DL_PATH,
                             [
                                 "--ffmpeg-location",
@@ -60,27 +60,7 @@ export const music: PrefixCommand = {
                                 link,
                             ]
                         )
-
-                        // exec(
-                        //     'youtube-dl --ffmpeg-location /usr/bin/ffmpeg --rm-cache-dir -x --audio-format mp3 -o ' + musicDir + '"%(title)s.%(ext)s" ' + link,
-                        //     function(error, stdout, stderr) {
-                        //         if(error) {
-                        //             // output to console until error message is parsed for cleaner channel output
-                        //             console.log(error)
-                        //             message.channel.send('Could not download that song.')
-                        //         }
-
-                        //         if(stdout) {
-                        //             let lines = stdout.split(/[\r\n]+/)
-                        //             console.log(lines)
-                        //             let rate = lines.at(-4)?.replace('[download] ', '')
-
-                        //             let songNameExt = lines.at(-3)?.replace('[ffmpeg] Destination: ' + musicDir, '')
-                        //             let songName = songNameExt?.replace('.mp3', '')
-
-                        //             message.channel.send('Download of **' + songName + '** complete! ' + rate)
-                        //         }
-
+                        
                         let rate = ""
 
                         ytdl.stdout.on("data", (data) => {

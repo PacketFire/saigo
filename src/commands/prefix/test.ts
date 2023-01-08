@@ -5,8 +5,13 @@ import { Database } from "better-sqlite3"
 export const test: PrefixCommand = {
     name: 'test',
     description: 'test command',
-    run: async (message: Message, parsedMsg: Array<string>, db: Database) => {
-        console.log(parsedMsg, db)
+    run: async (
+        message: Message,
+        parsedMsg: Array<string>,
+        db: Database,
+        auth_type: string
+    ) => {
+        console.log(parsedMsg, db, auth_type)
         message.channel.send('test message complete..')
     }
 }

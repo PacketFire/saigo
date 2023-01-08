@@ -1,4 +1,4 @@
-import { Client, Message, User } from "discord.js"
+import { Client, Message } from "discord.js"
 import getPrefixCommands from "../../commands/prefix/triggers"
 import { Database } from "better-sqlite3"
 
@@ -15,16 +15,9 @@ export default (client: Client, db: Database): void => {
                 ': \x1b[0;37m' + message.content + '\x1b[0m'
             )
 
-            if(await handlePermissions(message.author)) {
-                await handlePrefixCommand(message, db)
-            }
+            await handlePrefixCommand(message, db)
         }
     })
-}
-
-const handlePermissions = async (author: User): Promise<boolean> => {
-    // temporarily hardcode until database support is added
-    return author.id === '391394861669941249' || author.id === '105768800191811584'
 }
 
 const handlePrefixCommand = async (message: Message, db: Database): Promise<void> => {
@@ -34,14 +27,22 @@ const handlePrefixCommand = async (message: Message, db: Database): Promise<void
         if(message.content[0] == prefix) {
             const parsedMsg = message.content.split(' ')
             const cmd = parsedMsg[0].replace(prefix, '')
-
             const commandTrigger = prefixCommands.find(c => c.name === cmd)
 
             if(!commandTrigger) {
                 return
             }
 
-            commandTrigger.run(message, parsedMsg, db)
+            const stmt = db.prepare(`
+                select auth_type from permissions where username = ?
+            `).get(message.author.username)
+ 
+            if(!stmt.auth_type) {
+                return
+            }
+
+            commandTrigger.run(message, parsedMsg, db, stmt.auth_type)
+
         }
     })
 }
