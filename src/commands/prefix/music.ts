@@ -33,7 +33,7 @@ export const music: PrefixCommand = {
                 const link = parsedMsg[2]
 
                 if (link) {
-                    const songId = crypto.randomUUID()
+                    const fileId = crypto.randomUUID()
 
                     if (link.includes("https://www.youtube.com/watch?")) {
                         const title = await getMetadata(link)
@@ -56,7 +56,7 @@ export const music: PrefixCommand = {
                                 "--audio-format",
                                 "opus",
                                 "-o",
-                                `${MUSIC_PATH}/${songId}.%(ext)s`,
+                                `${MUSIC_PATH}/${fileId}.%(ext)s`,
                                 link,
                             ]
                         )
@@ -99,21 +99,22 @@ export const music: PrefixCommand = {
                             if (code === 0) {
                                 try {
                                     const stmt = db.prepare(
-                                        "insert into music (id,name,fetched_by) values(?, ?, ?)"
+                                        "insert into music (file_id,title,fetched_by,link) values(?, ?, ?, ?)"
                                     )
                                     stmt.run(
-                                        songId,
+                                        fileId,
                                         title,
-                                        message.author.username
+                                        message.author.username,
+                                        link
                                     )
 
                                     message.channel.send(
-                                        `Download completed ${rate}, id=**${songId}**.`
+                                        `Download completed for **${title}**, rate=**${rate}**, fileId=**${fileId}**.`
                                     )
                                 } catch (err) {
                                     console.log(err)
                                     message.channel.send(
-                                        "Error inserting songName into database."
+                                        "Error inserting song into database."
                                     )
                                 }
                             } else {
