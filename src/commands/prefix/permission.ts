@@ -24,7 +24,7 @@ export const permission: PrefixCommand = {
 
                         if(authType) {
                             const stmt = db.prepare(`
-                                insert into permissions(username, auth_type) values(? ?)
+                                insert into permissions (username, auth_type) values(?, ?)
                             `)
                             stmt.run(username, authType)
                             
@@ -45,6 +45,14 @@ export const permission: PrefixCommand = {
                 case 'del':
                     break
                 case 'list':
+                    const stmt = db.prepare(`select * from permissions`).all()
+                    message.channel.send(`User Permissions List`)
+
+                    stmt.forEach(user => {
+                        message.channel.send(
+                            "``" + user.id + ". | " + user.username + " | " + user.auth_type + "``\n"
+                        )
+                    })
                     break
                 default:
                     message.channel.send(permission.description)
